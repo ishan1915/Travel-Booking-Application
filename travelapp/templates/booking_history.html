@@ -1,0 +1,107 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking History</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">My Booking History</h2>
+
+    <!-- 🔎 Filter Form -->
+    <form method="get" class="row g-3 mb-4 shadow p-3 bg-white rounded">
+        <div class="col-md-3">
+            <label class="form-label">Type</label>
+            <select name="type" class="form-select">
+                <option value="">All</option>
+                {% for t in travel_types %}
+                    <option value="{{ t }}" {% if selected_type == t %}selected{% endif %}>{{ t }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Source</label>
+            <select name="source" class="form-select">
+                <option value="">All</option>
+                {% for s in sources %}
+                    <option value="{{ s }}" {% if selected_source == s %}selected{% endif %}>{{ s }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Destination</label>
+            <select name="destination" class="form-select">
+                <option value="">All</option>
+                {% for d in destinations %}
+                    <option value="{{ d }}" {% if selected_destination == d %}selected{% endif %}>{{ d }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Date</label>
+            <input type="date" name="date" class="form-control" value="{{ selected_date|default:'' }}">
+        </div>
+
+        <div class="col-md-12 text-end">
+            <button type="submit" class="btn btn-primary">Filter</button>
+            <a href="{% url 'booking_history' %}" class="btn btn-secondary">Reset</a>
+        </div>
+    </form>
+
+    {% if bookings %}
+    <table class="table table-bordered table-striped shadow">
+        <thead class="table-dark">
+            <tr>
+                <th>Travel Option</th>
+                <th>Seats</th>
+                <th>Total Price</th>
+                <th>Booking Date</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for booking in bookings %}
+            <tr>
+                <td>{{ booking.travel_option }}</td>
+                <td>{{ booking.number_of_seats }}</td>
+                <td>₹{{ booking.total_price }}</td>
+                <td>{{ booking.booking_date|date:"M d, Y H:i" }}</td>
+                <td>
+                    {% if booking.status == "Confirmed" %}
+                        <span class="badge bg-success">Confirmed</span>
+                    {% else %}
+                        <span class="badge bg-danger">Cancelled</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if booking.status == "Confirmed" %}
+                        <a href="{% url 'cancel_booking' booking.booking_id %}" class="btn btn-sm btn-danger">Cancel</a>
+                    {% else %}
+                        <span class="text-muted">N/A</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <div class="alert alert-info text-center">
+            You have no bookings yet.
+        </div>
+    {% endif %}
+
+    <div class="text-center mt-3">
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+</div>
+
+</body>
+</html>
