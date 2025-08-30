@@ -5,6 +5,9 @@ from django.contrib.auth.forms import AuthenticationForm,UserCreationForm
 from .models import *
 from .forms import *
 from django.contrib import messages
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .serializers import *
 # Create your views here.
 def loginview(request):
     if request.method=='POST':
@@ -77,11 +80,9 @@ def create_booking(request):
     return render(request, "booking.html", {"form": form})
 
 
-from django.shortcuts import render
-from .models import Booking, TravelOption
-from django.contrib.auth.decorators import login_required
 
-@login_required
+
+ 
 def booking_history(request):
     user = request.user
 
@@ -128,3 +129,29 @@ def cancel_booking(request, booking_id):
         booking.status = "Cancelled"
         booking.save()
     return redirect("booking_history")
+
+
+@api_view(['POST'])
+def login_apiview(request):
+    username=request.data.get('username')
+    password=request.data.get('password')
+    user=authenticate(request,username=username,password=password)
+    if user is not None:
+        login(request,user)
+        serializer=UserSerializer(user)
+        return Response({'msg':'login success','user':serializer.data},status=200)
+    return Response(serializer.errors)
+
+
+@api_view(['GET'])
+def booking_all(request):
+    booking=Booking.objects.all()
+    serializers=BookingGetSerializer(booking,many=True)
+    return Response(serializers.data)
+
+
+@api_view(['GET'])
+def booking_detail(request):
+    booking=Booking.objects.filter(user=request.user)
+    serializer=BookingSerializer(booking,many=True)
+    return Response(serializer.data)
