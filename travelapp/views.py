@@ -130,7 +130,7 @@ def cancel_booking(request, booking_id):
         booking.save()
     return redirect("booking_history")
 
-
+#api views#############################################################################
 @api_view(['POST'])
 def login_apiview(request):
     username=request.data.get('username')
@@ -155,3 +155,5 @@ def booking_detail(request):
     booking=Booking.objects.filter(user=request.user)
     serializer=BookingSerializer(booking,many=True)
     return Response(serializer.data)
+
+
