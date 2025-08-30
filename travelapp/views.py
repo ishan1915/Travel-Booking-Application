@@ -131,6 +131,7 @@ def cancel_booking(request, booking_id):
     return redirect("booking_history")
 
 #api views#############################################################################
+#extendig the project and adding drf apis #############################################
 @api_view(['POST'])
 def login_apiview(request):
     username=request.data.get('username')
