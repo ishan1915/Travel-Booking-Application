@@ -16,4 +16,6 @@ urlpatterns = [
     path('booking_detail/',booking_detail,name='booking_detail'),
     path('booking/all/',booking_all,name='booking_all'),
     path('api/login/',login_apiview,name='login_api'),
+    path('api/signup/',usercreate,name='apisignup'),
+    path('api/profile/',create_profileapi,name='create_profileapi'),
 ]

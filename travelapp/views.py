@@ -8,6 +8,7 @@ from django.contrib import messages
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .serializers import *
+from rest_framework import status
 # Create your views here.
 def loginview(request):
     if request.method=='POST':
@@ -143,6 +144,13 @@ def login_apiview(request):
         return Response({'msg':'login success','user':serializer.data},status=200)
     return Response(serializer.errors)
 
+@api_view(['POST'])
+def usercreate(request):
+    serializer=UserCreateSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response({'msg':'user created','user':serializer.data},status=status.HTTP_201_CREATED)
+    return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 def booking_all(request):
@@ -158,3 +166,15 @@ def booking_detail(request):
     return Response(serializer.data)
 
 
+@api_view(['POST'])
+def create_profileapi(request):
+    user=request.user
+    user_id=user.id
+    data=request.data.copy()
+    data['user']=user_id
+     
+    serializer=ProfileSerializer(data=data)
+    if serializer.is_valid():
+        serializer.save(user=user)
+        return Response(serializer.data,status=status.HTTP_201_CREATED)
+    return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
